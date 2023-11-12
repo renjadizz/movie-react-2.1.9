@@ -4,9 +4,10 @@ import React from 'react'
 import MovieApiService from '../../utils/MovieApiService'
 import Card from '../Card/Card'
 import Search from '../Search/Search'
+import Footer from '../Footer/Footer'
 import './App.css'
 
-const { Header, Footer, Content } = Layout
+const { Header, Footer: AntFooter, Content } = Layout
 
 class App extends React.Component {
   state = {
@@ -80,7 +81,9 @@ class App extends React.Component {
           <Search />
         </Header>
         <Content className="card-panel">{cardData}</Content>
-        <Footer>footer</Footer>
+        <AntFooter>
+          <Footer />
+        </AntFooter>
       </Layout>
     )
   }
