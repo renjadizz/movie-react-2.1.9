@@ -1,0 +1,122 @@
+.card-desktop {
+    display: grid;
+    grid-template-columns: fit-content(40%) fit-content(60%);
+    margin: 1rem 2rem;
+    background-color: white;
+    box-shadow: 5px 4px 24px -4px rgba(99, 99, 99, 0.71);
+}
+
+.card-desktop__image {
+    width: 100%;
+    height: 100%;
+    max-height: 280px;
+    object-fit: cover;
+}
+
+.card-desktop__text__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.card-desktop__text {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 0.5rem;
+}
+
+.card-desktop__text__votes {
+    border-radius: 30px;
+    border: 0.2rem solid #E9D100;
+    padding: 0.3rem;
+}
+
+.card-desktop__text__title {
+    font-size: 18px;
+    font-weight: bold;
+    margin: 0;
+    padding: 0.3rem 0;
+}
+
+.card-desktop__text__date {
+    font-size: 12px;
+    margin: 0;
+    color: #827E7E;
+}
+
+.card-desktop__text__genre {
+    font-size: 12px;
+    background-color: #FAFAFA;
+    border-radius: 10%;
+    border: 0.15rem solid #D9D9D9;
+    padding: 0.1rem;
+    margin-right: 0.2rem;
+    color: #000000A6;
+}
+
+.card-desktop__text__overview {
+    font-size: 12px;
+    padding-right: 2rem;
+}
+
+.card-desktop__text__stars--font-size {
+    font-size: 15px;
+}
+
+.card-mobile {
+    display: none;
+}
+
+@media (max-width: 900px) {
+
+    .card-desktop {
+        display: none;
+    }
+
+    .card-mobile {
+        display: grid;
+        margin: 1rem 2rem;
+        padding: 1rem;
+        background-color: white;
+        box-shadow: 5px 4px 24px -4px rgba(99, 99, 99, 0.71);
+        max-width: 400px;
+        max-height: 245px;
+    }
+
+    .card-mobile__top {
+        display: grid;
+        grid-template-columns: 20% 50% 30%;
+        align-items: start;
+    }
+
+    .card-mobile__top p {
+        margin: 0;
+    }
+
+    .card-mobile__top__text__title {
+        font-weight: bold;
+    }
+
+    .card-mobile__top__text__date {
+        padding: 0.3rem 0;
+    }
+
+    .card-mobile__top__text__votes {
+        float: right;
+    }
+
+    .card-mobile__top__text__genres {
+        white-space: nowrap;
+    }
+
+    .card-mobile__stars {
+        display: flex;
+        justify-self: flex-end;
+    }
+
+    .card-mobile__image {
+        width: 100%;
+        max-width: 60px;
+    }
+}

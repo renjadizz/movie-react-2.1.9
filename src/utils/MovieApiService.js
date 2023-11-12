@@ -12,6 +12,11 @@ export default class MovieApiService {
   async getAllMovies() {
     const res = await fetch(this._moviePopularUrl, this._options)
     const resJson = await res.json()
-    return resJson.results
+    return resJson.results.slice(0, 6)
+  }
+  async getMovieGenres() {
+    const res = await fetch('https://api.themoviedb.org/3/genre/movie/list?language=en', this._options)
+    const resJson = await res.json()
+    return resJson.genres
   }
 }

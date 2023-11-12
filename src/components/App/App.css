@@ -1,0 +1,38 @@
+.main {
+    background-color: white;
+    max-width: 70vw;
+    display: grid;
+    grid-template-columns: auto;
+    grid-template-rows: 10% 85% 5%;
+}
+
+.header {
+    background-color: navajowhite;
+}
+
+.card-panel {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr 1fr;
+    align-content: space-between;
+    overflow-y: auto;
+}
+
+@media (max-width: 1045px) {
+    .main {
+        max-width: 90vw;
+    }
+}
+
+@media (max-width: 900px) {
+    .main {
+        max-width: 100vw;
+        display: flex;
+    }
+
+    .card-panel {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+}
