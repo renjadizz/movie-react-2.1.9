@@ -3,7 +3,7 @@
     grid-template-columns: fit-content(40%) fit-content(60%);
     margin: 1rem 2rem;
     background-color: white;
-    box-shadow: 5px 4px 24px -4px rgba(99, 99, 99, 0.71);
+    box-shadow: 5px 10px 10px -8px rgba(99, 99, 99, 0.71);
 }
 
 .card-desktop__image {
@@ -79,7 +79,7 @@
         margin: 1rem 2rem;
         padding: 1rem;
         background-color: white;
-        box-shadow: 5px 4px 24px -4px rgba(99, 99, 99, 0.71);
+        box-shadow: 5px 10px 10px -8px rgba(99, 99, 99, 0.71);
         max-width: 400px;
         max-height: 245px;
     }

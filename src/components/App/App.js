@@ -3,7 +3,7 @@ import React from 'react'
 
 import MovieApiService from '../../utils/MovieApiService'
 import Card from '../Card/Card'
-
+import Search from '../Search/Search'
 import './App.css'
 
 const { Header, Footer, Content } = Layout
@@ -76,7 +76,9 @@ class App extends React.Component {
     })
     return (
       <Layout className="main">
-        <Header className="header">header</Header>
+        <Header className="header">
+          <Search />
+        </Header>
         <Content className="card-panel">{cardData}</Content>
         <Footer>footer</Footer>
       </Layout>
