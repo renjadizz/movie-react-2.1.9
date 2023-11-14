@@ -1,4 +1,4 @@
-import { Layout, Spin } from 'antd'
+import { Layout, Spin, Alert, Space } from 'antd'
 import React from 'react'
 
 import MovieApiService from '../../utils/MovieApiService'
@@ -14,6 +14,7 @@ export default class App extends React.Component {
     movies: [],
     genres: [],
     loading: true,
+    error: null,
   }
   componentDidMount() {
     this.populateGenres()
@@ -22,42 +23,60 @@ export default class App extends React.Component {
   truncateText(text) {
     text = text.trim()
     let words = text.split(' ')
-
     return words.length > 25 ? words.slice(0, 25).join(' ') + '...' : text
   }
   async populateAllMovies() {
     const data = new MovieApiService()
-    await data.getAllMovies().then((results) => {
-      const movies = results.map((movie) => {
-        return {
-          id: movie.id,
-          gendreIds: [...movie.genre_ids],
-          title: movie.title,
-          poster: movie.poster_path,
-          votes: movie.vote_average.toFixed(1),
-          overview: this.truncateText(movie.overview),
-          releaseDate: movie.release_date,
-        }
+    await data
+      .getAllMovies()
+      .then((results) => {
+        if (results instanceof Error) throw new Error(results.message)
+        const movies = results.map((movie) => {
+          return {
+            id: movie.id,
+            gendreIds: [...movie.genre_ids],
+            title: movie.title,
+            poster: movie.poster_path,
+            votes: movie.vote_average.toFixed(1),
+            overview: this.truncateText(movie.overview),
+            releaseDate: movie.release_date,
+          }
+        })
+        this.setState({
+          movies: movies,
+          loading: false,
+          error: null,
+        })
       })
-      this.setState({
-        movies: movies,
-        loading: false,
+      .catch((error) => {
+        this.setState({
+          error: error,
+          loading: false,
+        })
       })
-    })
   }
   async populateGenres() {
     const data = new MovieApiService()
-    await data.getMovieGenres().then((results) => {
-      const genres = results.map((genre) => {
-        return {
-          id: genre.id,
-          name: genre.name,
-        }
+    await data
+      .getMovieGenres()
+      .then((results) => {
+        if (results instanceof Error) throw new Error(results)
+        const genres = results.map((genre) => {
+          return {
+            id: genre.id,
+            name: genre.name,
+          }
+        })
+        this.setState({
+          genres: genres,
+          error: null,
+        })
       })
-      this.setState({
-        genres: genres,
+      .catch((error) => {
+        this.setState({
+          error: error,
+        })
       })
-    })
   }
   render() {
     const loading = this.state.loading ? (
@@ -68,11 +87,17 @@ export default class App extends React.Component {
       </Content>
     ) : null
     const movies = !this.state.loading ? <AppView movies={this.state.movies} genres={this.state.genres} /> : null
-
+    const error =
+      this.state.error !== null ? (
+        <Space align="center">
+          <Alert message={this.state.error.message} type="error" closable />
+        </Space>
+      ) : null
     return (
       <Layout className="main">
         <Header className="header">
           <Search />
+          {error}
         </Header>
         {loading}
         {movies}
@@ -101,9 +126,5 @@ const AppView = ({ movies, genres }) => {
     })
     return <Card key={el.id} movie={el} movieGenres={movieGenreNames} />
   })
-  return (
-    <>
-      <Content className="card-panel">{cardData}</Content>
-    </>
-  )
+  return <Content className="card-panel">{cardData}</Content>
 }
