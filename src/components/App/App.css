@@ -18,6 +18,10 @@
     overflow-y: auto;
 }
 
+.spin {
+    align-self: center;
+}
+
 @media (max-width: 1045px) {
     .main {
         max-width: 90vw;

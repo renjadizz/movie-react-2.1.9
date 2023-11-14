@@ -1,4 +1,4 @@
-import { Layout } from 'antd'
+import { Layout, Spin } from 'antd'
 import React from 'react'
 
 import MovieApiService from '../../utils/MovieApiService'
@@ -9,10 +9,11 @@ import './App.css'
 
 const { Header, Footer: AntFooter, Content } = Layout
 
-class App extends React.Component {
+export default class App extends React.Component {
   state = {
     movies: [],
     genres: [],
+    loading: true,
   }
   componentDidMount() {
     this.populateGenres()
@@ -40,6 +41,7 @@ class App extends React.Component {
       })
       this.setState({
         movies: movies,
+        loading: false,
       })
     })
   }
@@ -58,29 +60,22 @@ class App extends React.Component {
     })
   }
   render() {
-    const { movies, genres } = this.state
-    const cardData = movies.map((el) => {
-      let movieGenres = []
-      for (const genreInElArr of el.gendreIds) {
-        movieGenres.push(genres.find((genreEl) => genreEl.id === genreInElArr))
-      }
-      let movieGenreNames = movieGenres.map((i) => {
-        if (i) {
-          if (i.name) {
-            return i.name
-          }
-        } else {
-          return ''
-        }
-      })
-      return <Card key={el.id} movie={el} movieGenres={movieGenreNames} />
-    })
+    const loading = this.state.loading ? (
+      <Content className="spin">
+        <Spin tip="Loading" size="large">
+          <div className="spin-content" />
+        </Spin>
+      </Content>
+    ) : null
+    const movies = !this.state.loading ? <AppView movies={this.state.movies} genres={this.state.genres} /> : null
+
     return (
       <Layout className="main">
         <Header className="header">
           <Search />
         </Header>
-        <Content className="card-panel">{cardData}</Content>
+        {loading}
+        {movies}
         <AntFooter>
           <Footer />
         </AntFooter>
@@ -89,4 +84,26 @@ class App extends React.Component {
   }
 }
 
-export default App
+const AppView = ({ movies, genres }) => {
+  const cardData = movies.map((el) => {
+    let movieGenres = []
+    for (const genreInElArr of el.gendreIds) {
+      movieGenres.push(genres.find((genreEl) => genreEl.id === genreInElArr))
+    }
+    let movieGenreNames = movieGenres.map((i) => {
+      if (i) {
+        if (i.name) {
+          return i.name
+        }
+      } else {
+        return ''
+      }
+    })
+    return <Card key={el.id} movie={el} movieGenres={movieGenreNames} />
+  })
+  return (
+    <>
+      <Content className="card-panel">{cardData}</Content>
+    </>
+  )
+}
