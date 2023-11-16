@@ -23,6 +23,10 @@
     align-self: center;
 }
 
+.footer {
+    text-align: center
+}
+
 @media (max-width: 1045px) {
     .main {
         max-width: 90vw;

@@ -3,6 +3,10 @@ import { Pagination } from 'antd'
 
 export default class Footer extends React.Component {
   render() {
-    return <Pagination defaultCurrent={1} total={50} />
+    const onChangePage = (page) => {
+      this.props.changePage(page)
+    }
+    const { totalMovies } = this.props
+    return <Pagination defaultCurrent={1} total={totalMovies} pageSize={20} onChange={onChangePage} />
   }
 }

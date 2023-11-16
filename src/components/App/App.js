@@ -16,23 +16,30 @@ export default class App extends React.Component {
     genres: [],
     loading: true,
     error: null,
+    totalMovies: 0,
+    page: 1,
   }
   componentDidMount() {
     this.populateGenres()
     this.populateAllMovies()
+  }
+  componentDidUpdate(prevProps, prevState) {
+    if (prevState.page !== this.state.page) {
+      this.populateAllMovies(this.state.page)
+    }
   }
   truncateText(text) {
     text = text.trim()
     let words = text.split(' ')
     return words.length > 25 ? words.slice(0, 25).join(' ') + '...' : text
   }
-  async populateAllMovies() {
+  async populateAllMovies(pageNumber) {
     const data = new MovieApiService()
     await data
-      .getAllMovies()
+      .getAllMovies(pageNumber)
       .then((results) => {
         if (results instanceof Error) throw new Error(results.message)
-        const movies = results.map((movie) => {
+        const movies = results.results.map((movie) => {
           return {
             id: movie.id,
             gendreIds: [...movie.genre_ids],
@@ -43,16 +50,19 @@ export default class App extends React.Component {
             releaseDate: movie.release_date,
           }
         })
+        const totalMovies = results.total_results
         this.setState({
           movies: movies,
           loading: false,
           error: null,
+          totalMovies,
         })
       })
       .catch((error) => {
         this.setState({
           error: error,
           loading: false,
+          totalMovies: 0,
         })
       })
   }
@@ -79,6 +89,11 @@ export default class App extends React.Component {
         })
       })
   }
+  changePage = (page) => {
+    this.setState({
+      page: page,
+    })
+  }
   render() {
     const loading = this.state.loading ? (
       <Content className="spin">
@@ -103,8 +118,8 @@ export default class App extends React.Component {
           </Header>
           {loading}
           {movies}
-          <AntFooter>
-            <Footer />
+          <AntFooter className="footer">
+            <Footer defaultCurrent={1} totalMovies={this.state.totalMovies} changePage={this.changePage} />
           </AntFooter>
         </NoInternetConnection>
       </Layout>

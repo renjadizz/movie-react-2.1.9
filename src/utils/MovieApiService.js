@@ -1,7 +1,7 @@
 import ResourceError from './ResourceError'
 
 export default class MovieApiService {
-  _moviePopularUrl = 'https://api.themoviedb.org/3/movie/popular?language=en-US&page=1'
+  _moviePopularUrl = 'https://api.themoviedb.org/3/movie/popular?language=en-US&page='
   _movieGenresUrl = 'https://api.themoviedb.org/3/genre/movie/list?language=en'
   _options = {
     method: 'GET',
@@ -12,14 +12,14 @@ export default class MovieApiService {
     },
     withCredentials: true,
   }
-  async getAllMovies() {
+  async getAllMovies(pageNumber = 1) {
     try {
-      const res = await fetch(this._moviePopularUrl, this._options)
+      const res = await fetch(this._moviePopularUrl + pageNumber, this._options)
       if (!res.ok) {
         throw new ResourceError('Error number is ' + res.status)
       }
       const resJson = await res.json()
-      return resJson.results.slice(0, 6)
+      return resJson
     } catch (error) {
       return error
     }
