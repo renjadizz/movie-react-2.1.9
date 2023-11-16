@@ -6,6 +6,7 @@ import Card from '../Card/Card'
 import Search from '../Search/Search'
 import Footer from '../Footer/Footer'
 import './App.css'
+import NoInternetConnection from '../NoInternetConnection/NoInternetConnection'
 
 const { Header, Footer: AntFooter, Content } = Layout
 
@@ -95,15 +96,17 @@ export default class App extends React.Component {
       ) : null
     return (
       <Layout className="main">
-        <Header className="header">
-          <Search />
-          {error}
-        </Header>
-        {loading}
-        {movies}
-        <AntFooter>
-          <Footer />
-        </AntFooter>
+        <NoInternetConnection>
+          <Header className="header">
+            <Search />
+            {error}
+          </Header>
+          {loading}
+          {movies}
+          <AntFooter>
+            <Footer />
+          </AntFooter>
+        </NoInternetConnection>
       </Layout>
     )
   }
