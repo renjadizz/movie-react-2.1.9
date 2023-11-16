@@ -6,7 +6,7 @@ export default class Card extends React.Component {
   render() {
     const movie = this.props.movie
     const imgPath = 'https://image.tmdb.org/t/p/w500/'
-    const movieDate = format(new Date(movie.releaseDate), 'MMMM d, yyyy')
+    let movieDate = movie.releaseDate !== '' ? format(new Date(movie.releaseDate), 'MMMM d, yyyy') : ''
     const movieGenres = this.props.movieGenres
     const movieGenresSpan = movieGenres.map((el) => {
       if (el !== '') {

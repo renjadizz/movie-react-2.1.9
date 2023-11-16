@@ -18,6 +18,7 @@ export default class App extends React.Component {
     error: null,
     totalMovies: 0,
     page: 1,
+    search: '',
   }
   componentDidMount() {
     this.populateGenres()
@@ -25,7 +26,10 @@ export default class App extends React.Component {
   }
   componentDidUpdate(prevProps, prevState) {
     if (prevState.page !== this.state.page) {
-      this.populateAllMovies(this.state.page)
+      this.populateAllMovies(this.state.page, this.state.search)
+    }
+    if (prevState.search !== this.state.search) {
+      this.populateAllMovies(this.state.page, this.state.search)
     }
   }
   truncateText(text) {
@@ -33,10 +37,10 @@ export default class App extends React.Component {
     let words = text.split(' ')
     return words.length > 25 ? words.slice(0, 25).join(' ') + '...' : text
   }
-  async populateAllMovies(pageNumber) {
+  async populateAllMovies(pageNumber, search) {
     const data = new MovieApiService()
     await data
-      .getAllMovies(pageNumber)
+      .getAllMovies(pageNumber, search)
       .then((results) => {
         if (results instanceof Error) throw new Error(results.message)
         const movies = results.results.map((movie) => {
@@ -95,6 +99,12 @@ export default class App extends React.Component {
       loading: true,
     })
   }
+  changeSearch = (search) => {
+    this.setState({
+      search,
+      loading: true,
+    })
+  }
   render() {
     const loading = this.state.loading ? (
       <Content className="spin">
@@ -114,7 +124,7 @@ export default class App extends React.Component {
       <Layout className="main">
         <NoInternetConnection>
           <Header className="header">
-            <Search />
+            <Search changeSearch={this.changeSearch} />
             {error}
           </Header>
           {loading}
