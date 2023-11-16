@@ -92,6 +92,7 @@ export default class App extends React.Component {
   changePage = (page) => {
     this.setState({
       page: page,
+      loading: true,
     })
   }
   render() {
