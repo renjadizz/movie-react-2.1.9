@@ -139,21 +139,29 @@ export default class App extends React.Component {
 }
 
 const AppView = ({ movies, genres }) => {
-  const cardData = movies.map((el) => {
-    let movieGenres = []
-    for (const genreInElArr of el.gendreIds) {
-      movieGenres.push(genres.find((genreEl) => genreEl.id === genreInElArr))
-    }
-    let movieGenreNames = movieGenres.map((i) => {
-      if (i) {
-        if (i.name) {
-          return i.name
-        }
-      } else {
-        return ''
+  if (movies.length === 0) {
+    return (
+      <Content>
+        <h1 className="no-data">No Data Found</h1>
+      </Content>
+    )
+  } else {
+    const cardData = movies.map((el) => {
+      let movieGenres = []
+      for (const genreInElArr of el.gendreIds) {
+        movieGenres.push(genres.find((genreEl) => genreEl.id === genreInElArr))
       }
+      let movieGenreNames = movieGenres.map((i) => {
+        if (i) {
+          if (i.name) {
+            return i.name
+          }
+        } else {
+          return ''
+        }
+      })
+      return <Card key={el.id} movie={el} movieGenres={movieGenreNames} />
     })
-    return <Card key={el.id} movie={el} movieGenres={movieGenreNames} />
-  })
-  return <Content className="card-panel">{cardData}</Content>
+    return <Content className="card-panel">{cardData}</Content>
+  }
 }
