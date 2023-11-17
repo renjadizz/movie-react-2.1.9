@@ -1,4 +1,4 @@
-import { Layout, Spin, Alert, Space } from 'antd'
+import { Layout, Spin, Alert, Space, Tabs } from 'antd'
 import React from 'react'
 
 import MovieApiService from '../../utils/MovieApiService'
@@ -9,7 +9,6 @@ import './App.css'
 import NoInternetConnection from '../NoInternetConnection/NoInternetConnection'
 
 const { Header, Footer: AntFooter, Content } = Layout
-
 export default class App extends React.Component {
   state = {
     movies: [],
@@ -21,6 +20,9 @@ export default class App extends React.Component {
     search: '',
     guestSessionId: '',
     guestSessionExpires: '',
+    guestMovies: [],
+    totalGuestMovies: 0,
+    guestPage: 1,
   }
   componentDidMount() {
     this.populateGenres()
@@ -34,6 +36,9 @@ export default class App extends React.Component {
     if (prevState.search !== this.state.search) {
       this.populateAllMovies(this.state.page, this.state.search)
     }
+    if (prevState.guestSessionId !== this.state.guestSessionId) {
+      this.populateRatedMovies(this.state.guestPage, this.state.guestSessionId)
+    }
   }
   truncateText(text) {
     text = text.trim()
@@ -46,6 +51,39 @@ export default class App extends React.Component {
       if (results.success)
         this.setState({ guestSessionId: results.guest_session_id, guestSessionExpires: results.expires_at })
     })
+  }
+  async populateRatedMovies(pageNumber, guestId) {
+    const data = new MovieApiService()
+    await data
+      .getGuestMovies(pageNumber, guestId)
+      .then((results) => {
+        if (results instanceof Error) throw new Error(results.message)
+        const movies = results.results.map((movie) => {
+          return {
+            id: movie.id,
+            gendreIds: [...movie.genre_ids],
+            title: movie.title,
+            poster: movie.poster_path,
+            votes: movie.vote_average.toFixed(1),
+            overview: this.truncateText(movie.overview),
+            releaseDate: movie.release_date,
+          }
+        })
+        const totalGuestMovies = results.total_results
+        this.setState({
+          guestMovies: movies,
+          loading: false,
+          error: null,
+          totalGuestMovies,
+        })
+      })
+      .catch((error) => {
+        this.setState({
+          error: error,
+          loading: false,
+          totalGuestMovies: 0,
+        })
+      })
   }
   async populateAllMovies(pageNumber, search) {
     const data = new MovieApiService()
@@ -124,24 +162,51 @@ export default class App extends React.Component {
       </Content>
     ) : null
     const movies = !this.state.loading ? <AppView movies={this.state.movies} genres={this.state.genres} /> : null
+    const guestMovies = !this.state.loading ? (
+      <AppView movies={this.state.guestMovies} genres={this.state.genres} />
+    ) : null
     const error =
       this.state.error !== null ? (
         <Space align="center">
           <Alert message={this.state.error.message} type="error" closable />
         </Space>
       ) : null
+    const items = [
+      {
+        label: 'Search',
+        key: 'item-1',
+        children: (
+          <Content className="content-all">
+            <Header className="header">
+              <Search changeSearch={this.changeSearch} />
+              {error}
+            </Header>
+            {loading}
+            {movies}
+            <AntFooter className="footer">
+              <Footer defaultCurrent={1} totalMovies={this.state.totalMovies} changePage={this.changePage} />
+            </AntFooter>
+          </Content>
+        ),
+      },
+      {
+        label: 'Rated',
+        key: 'item-2',
+        children: (
+          <Content className="content-rated">
+            {loading}
+            {guestMovies}
+            <AntFooter className="footer">
+              <Footer defaultCurrent={1} totalGuestMovies={this.state.totalGuestMovies} changePage={this.changePage} />
+            </AntFooter>
+          </Content>
+        ),
+      },
+    ]
     return (
       <Layout className="main">
         <NoInternetConnection>
-          <Header className="header">
-            <Search changeSearch={this.changeSearch} />
-            {error}
-          </Header>
-          {loading}
-          {movies}
-          <AntFooter className="footer">
-            <Footer defaultCurrent={1} totalMovies={this.state.totalMovies} changePage={this.changePage} />
-          </AntFooter>
+          <Tabs items={items} centered defaultActiveKey={1} />
         </NoInternetConnection>
       </Layout>
     )

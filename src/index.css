@@ -2,11 +2,11 @@ body {
     margin: 0 auto;
     padding: 0;
     font-family: Inter, system-ui;
+    background-color: #E6E6E6;
 }
 
 #root {
     height: 100vh;
     display: flex;
     justify-content: space-around;
-    background-color: #E6E6E6;
 }

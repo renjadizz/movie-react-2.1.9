@@ -56,4 +56,19 @@ export default class MovieApiService {
       return error
     }
   }
+  async getGuestMovies(pageNumber = 1, id) {
+    try {
+      const res = fetch(
+        `https://api.themoviedb.org/3/guest_session/${id}/rated/movies?language=en-US&page=${pageNumber}`,
+        this._options
+      )
+      if (!res.ok) {
+        throw new ResourceError('Error number is ' + res.status)
+      }
+      const resJson = await res.json()
+      return resJson
+    } catch (error) {
+      return error
+    }
+  }
 }

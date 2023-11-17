@@ -1,9 +1,27 @@
 .main {
     background-color: white;
     max-width: 70vw;
+
+}
+
+.ant-tabs-tabpane {
+    height: 100vh;
+}
+
+.content-all {
     display: grid;
     grid-template-columns: auto;
     grid-template-rows: 10% 85% 5%;
+    background-color: white;
+    height: 100%;
+}
+
+.content-rated {
+    display: grid;
+    grid-template-columns: auto;
+    grid-template-rows: 95% 5%;
+    background-color: white;
+    height: 100%;
 }
 
 .header {
