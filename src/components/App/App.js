@@ -19,10 +19,13 @@ export default class App extends React.Component {
     totalMovies: 0,
     page: 1,
     search: '',
+    guestSessionId: '',
+    guestSessionExpires: '',
   }
   componentDidMount() {
     this.populateGenres()
     this.populateAllMovies()
+    this.createGuestSession()
   }
   componentDidUpdate(prevProps, prevState) {
     if (prevState.page !== this.state.page) {
@@ -36,6 +39,13 @@ export default class App extends React.Component {
     text = text.trim()
     let words = text.split(' ')
     return words.length > 25 ? words.slice(0, 25).join(' ') + '...' : text
+  }
+  async createGuestSession() {
+    const data = new MovieApiService()
+    await data.createGuestSession().then((results) => {
+      if (results.success)
+        this.setState({ guestSessionId: results.guest_session_id, guestSessionExpires: results.expires_at })
+    })
   }
   async populateAllMovies(pageNumber, search) {
     const data = new MovieApiService()

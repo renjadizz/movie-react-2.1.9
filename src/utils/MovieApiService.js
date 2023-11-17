@@ -3,6 +3,7 @@ import ResourceError from './ResourceError'
 export default class MovieApiService {
   _moviePopularUrl = 'https://api.themoviedb.org/3/'
   _movieGenresUrl = 'https://api.themoviedb.org/3/genre/movie/list?language=en'
+  _guestSessionUrl = 'https://api.themoviedb.org/3/authentication/guest_session/new'
   _options = {
     method: 'GET',
     headers: {
@@ -39,6 +40,18 @@ export default class MovieApiService {
       }
       const resJson = await res.json()
       return resJson.genres
+    } catch (error) {
+      return error
+    }
+  }
+  async createGuestSession() {
+    try {
+      const res = await fetch(this._guestSessionUrl, this._options)
+      if (!res.ok) {
+        throw new ResourceError('Error number is ' + res.status)
+      }
+      const resJson = await res.json()
+      return resJson
     } catch (error) {
       return error
     }
