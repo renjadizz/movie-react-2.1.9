@@ -23,6 +23,7 @@ export default class App extends React.Component {
     guestMovies: [],
     totalGuestMovies: 0,
     guestPage: 1,
+    needUpdate: false,
   }
   componentDidMount() {
     this.populateGenres()
@@ -33,11 +34,21 @@ export default class App extends React.Component {
     if (prevState.page !== this.state.page) {
       this.populateAllMovies(this.state.page, this.state.search)
     }
+    if (prevState.guestPage !== this.state.guestPage) {
+      this.populateRatedMovies(this.state.guestPage, this.state.guestSessionId)
+    }
     if (prevState.search !== this.state.search) {
       this.populateAllMovies(this.state.page, this.state.search)
     }
     if (prevState.guestSessionId !== this.state.guestSessionId) {
       this.populateRatedMovies(this.state.guestPage, this.state.guestSessionId)
+    }
+    if (this.state.needUpdate) {
+      this.populateAllMovies(this.state.page, this.state.search)
+      this.populateRatedMovies(this.state.guestPage, this.state.guestSessionId)
+      this.setState({
+        needUpdate: false,
+      })
     }
   }
   truncateText(text) {
@@ -45,16 +56,15 @@ export default class App extends React.Component {
     let words = text.split(' ')
     return words.length > 25 ? words.slice(0, 25).join(' ') + '...' : text
   }
-  async createGuestSession() {
-    const data = new MovieApiService()
-    await data.createGuestSession().then((results) => {
+  data = new MovieApiService()
+  createGuestSession() {
+    this.data.createGuestSession().then((results) => {
       if (results.success)
         this.setState({ guestSessionId: results.guest_session_id, guestSessionExpires: results.expires_at })
     })
   }
-  async populateRatedMovies(pageNumber, guestId) {
-    const data = new MovieApiService()
-    await data
+  populateRatedMovies(pageNumber, guestId) {
+    this.data
       .getGuestMovies(pageNumber, guestId)
       .then((results) => {
         if (results instanceof Error) throw new Error(results.message)
@@ -64,7 +74,7 @@ export default class App extends React.Component {
             gendreIds: [...movie.genre_ids],
             title: movie.title,
             poster: movie.poster_path,
-            votes: movie.vote_average.toFixed(1),
+            votes: movie.rating,
             overview: this.truncateText(movie.overview),
             releaseDate: movie.release_date,
           }
@@ -85,9 +95,8 @@ export default class App extends React.Component {
         })
       })
   }
-  async populateAllMovies(pageNumber, search) {
-    const data = new MovieApiService()
-    await data
+  populateAllMovies(pageNumber, search) {
+    this.data
       .getAllMovies(pageNumber, search)
       .then((results) => {
         if (results instanceof Error) throw new Error(results.message)
@@ -97,7 +106,6 @@ export default class App extends React.Component {
             gendreIds: [...movie.genre_ids],
             title: movie.title,
             poster: movie.poster_path,
-            votes: movie.vote_average.toFixed(1),
             overview: this.truncateText(movie.overview),
             releaseDate: movie.release_date,
           }
@@ -118,9 +126,8 @@ export default class App extends React.Component {
         })
       })
   }
-  async populateGenres() {
-    const data = new MovieApiService()
-    await data
+  populateGenres() {
+    this.data
       .getMovieGenres()
       .then((results) => {
         if (results instanceof Error) throw new Error(results)
@@ -147,10 +154,25 @@ export default class App extends React.Component {
       loading: true,
     })
   }
+  changeRatedPage = (page) => {
+    this.setState({
+      guestPage: page,
+      loading: true,
+    })
+  }
   changeSearch = (search) => {
     this.setState({
       search,
       loading: true,
+    })
+  }
+  setRateValue = (id, value) => {
+    this.data.postGuestMovies(id, value).then((result) => {
+      if (result.success === true) {
+        this.setState({
+          needUpdate: true,
+        })
+      }
     })
   }
   render() {
@@ -161,9 +183,16 @@ export default class App extends React.Component {
         </Spin>
       </Content>
     ) : null
-    const movies = !this.state.loading ? <AppView movies={this.state.movies} genres={this.state.genres} /> : null
+    const movies = !this.state.loading ? (
+      <AppView
+        movies={this.state.movies}
+        genres={this.state.genres}
+        guestMovie={this.state.guestMovies}
+        setRateValue={this.setRateValue}
+      />
+    ) : null
     const guestMovies = !this.state.loading ? (
-      <AppView movies={this.state.guestMovies} genres={this.state.genres} />
+      <AppView movies={this.state.guestMovies} genres={this.state.genres} setRateValue={this.setRateValue} />
     ) : null
     const error =
       this.state.error !== null ? (
@@ -197,7 +226,7 @@ export default class App extends React.Component {
             {loading}
             {guestMovies}
             <AntFooter className="footer">
-              <Footer defaultCurrent={1} totalGuestMovies={this.state.totalGuestMovies} changePage={this.changePage} />
+              <Footer defaultCurrent={1} totalMovies={this.state.totalGuestMovies} changePage={this.changeRatedPage} />
             </AntFooter>
           </Content>
         ),
@@ -213,7 +242,7 @@ export default class App extends React.Component {
   }
 }
 
-const AppView = ({ movies, genres }) => {
+const AppView = ({ movies, genres, guestMovie, setRateValue }) => {
   if (movies.length === 0) {
     return (
       <Content>
@@ -235,7 +264,19 @@ const AppView = ({ movies, genres }) => {
           return ''
         }
       })
-      return <Card key={el.id} movie={el} movieGenres={movieGenreNames} />
+      let movieRate = 0
+      if (!el.votes) {
+        const movieRated = guestMovie.find((element) => element.id === el.id)
+        if (movieRated !== undefined) {
+          movieRate = movieRated.votes
+        }
+      } else {
+        movieRate = el.votes
+      }
+
+      return (
+        <Card key={el.id} movieRate={movieRate} movie={el} movieGenres={movieGenreNames} setRateValue={setRateValue} />
+      )
     })
     return <Content className="card-panel">{cardData}</Content>
   }

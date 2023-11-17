@@ -58,13 +58,31 @@ export default class MovieApiService {
   }
   async getGuestMovies(pageNumber = 1, id) {
     try {
-      const res = fetch(
-        `https://api.themoviedb.org/3/guest_session/${id}/rated/movies?language=en-US&page=${pageNumber}`,
+      const res = await fetch(
+        `https://api.themoviedb.org/3/account/${id}/rated/movies?language=en-US&page=${pageNumber}`,
         this._options
       )
       if (!res.ok) {
         throw new ResourceError('Error number is ' + res.status)
       }
+      const resJson = await res.json()
+      return resJson
+    } catch (error) {
+      return error
+    }
+  }
+  async postGuestMovies(id, rating) {
+    try {
+      const res = await fetch(`https://api.themoviedb.org/3/movie/${id}/rating`, {
+        method: 'POST',
+        headers: {
+          accept: 'application/json',
+          'Content-Type': 'application/json;charset=utf-8',
+          Authorization:
+            'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJmZjRhYThjMWY5M2Y2NTUyYzkwZWM1NWQ4ZDkyODI2YSIsInN1YiI6IjY1NGU0OWUzNDFhNTYxMzM2ODg3MDA2NSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.yyIOsm-pcTOBNaCQa1mXH-ZcBGEMCDhn-zbj0YDXqUI',
+        },
+        body: JSON.stringify({ value: rating }),
+      })
       const resJson = await res.json()
       return resJson
     } catch (error) {

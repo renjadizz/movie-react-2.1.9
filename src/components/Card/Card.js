@@ -3,6 +3,9 @@ import './Card.css'
 import { format } from 'date-fns'
 import { Rate } from 'antd'
 export default class Card extends React.Component {
+  setRateValue = (value) => {
+    this.props.setRateValue(this.props.movie.id, value)
+  }
   render() {
     const movie = this.props.movie
     const imgPath = 'https://image.tmdb.org/t/p/w500/'
@@ -17,6 +20,11 @@ export default class Card extends React.Component {
         )
       }
     })
+    const movieRate = this.props.movieRate
+    const movieRateDesktop = movieRate !== 0 ? <p className="card-desktop__text__votes">{movieRate}</p> : null
+    const movieRateMobile =
+      movieRate !== 0 ? <p className="card-desktop__text__votes card-mobile__top__text__votes">{movieRate}</p> : null
+
     return (
       <>
         <div className="card-desktop">
@@ -26,7 +34,7 @@ export default class Card extends React.Component {
           <div className="card-desktop__text">
             <div className="card-desktop__text__header">
               <p className="card-desktop__text__title">{movie.title}</p>
-              <p className="card-desktop__text__votes">{movie.votes}</p>
+              {movieRateDesktop}
             </div>
             <p className="card-desktop__text__date">{movieDate}</p>
             <div>{movieGenresSpan}</div>
@@ -34,10 +42,10 @@ export default class Card extends React.Component {
             <div className="card-desktop__text__stars">
               <Rate
                 className="card-desktop__text__stars--font-size"
-                disabled
                 allowHalf
                 defaultMovie={0}
-                value={Number(movie.votes)}
+                onChange={this.setRateValue}
+                value={Number(movieRate)}
                 count={10}
               />
             </div>
@@ -51,9 +59,7 @@ export default class Card extends React.Component {
               <p className="card-desktop__text__date card-mobile__top__text__date">{movieDate}</p>
               <div className="card-mobile__top__text__genres card-mobile__top__text__genres">{movieGenresSpan}</div>
             </div>
-            <div>
-              <p className="card-desktop__text__votes card-mobile__top__text__votes">{movie.votes}</p>
-            </div>
+            <div>{movieRateMobile}</div>
           </div>
           <div className="card-mobile__text">
             <p className="card-desktop__text__overview">{movie.overview}</p>
@@ -61,10 +67,10 @@ export default class Card extends React.Component {
           <div className="card-mobile__stars">
             <Rate
               className="card-desktop__text__stars--font-size"
-              disabled
               allowHalf
               defaultMovie={0}
-              value={Number(movie.votes)}
+              onChange={this.setRateValue}
+              value={Number(movieRate)}
               count={10}
             />
           </div>
