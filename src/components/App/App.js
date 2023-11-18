@@ -44,7 +44,7 @@ export default class App extends React.Component {
       this.populateRatedMovies(this.state.guestPage, this.state.guestSessionId)
     }
     if (this.state.needUpdate) {
-      this.populateAllMovies(this.state.page, this.state.search)
+      //this.populateAllMovies(this.state.page, this.state.search)
       this.populateRatedMovies(this.state.guestPage, this.state.guestSessionId)
       this.setState({
         needUpdate: false,
@@ -63,6 +63,7 @@ export default class App extends React.Component {
         this.setState({ guestSessionId: results.guest_session_id, guestSessionExpires: results.expires_at })
     })
   }
+
   populateRatedMovies(pageNumber, guestId) {
     this.data
       .getGuestMovies(pageNumber, guestId)
@@ -167,7 +168,7 @@ export default class App extends React.Component {
     })
   }
   setRateValue = (id, value) => {
-    this.data.postGuestMovies(id, value).then((result) => {
+    this.data.postGuestMovies(id, value, this.state.guestSessionId).then((result) => {
       if (result.success === true) {
         this.setState({
           needUpdate: true,

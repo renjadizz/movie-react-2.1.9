@@ -13,6 +13,7 @@ export default class MovieApiService {
     },
     withCredentials: true,
   }
+  _apiKey = 'ff4aa8c1f93f6552c90ec55d8d92826a'
   async getAllMovies(pageNumber = 1, search = '') {
     try {
       let movieUrl = this._moviePopularUrl
@@ -59,8 +60,11 @@ export default class MovieApiService {
   async getGuestMovies(pageNumber = 1, id) {
     try {
       const res = await fetch(
-        `https://api.themoviedb.org/3/account/${id}/rated/movies?language=en-US&page=${pageNumber}`,
-        this._options
+        `https://api.themoviedb.org/3/guest_session/${id}/rated/movies?language=en-US&page=${pageNumber}&api_key=${this._apiKey}`,
+        {
+          method: 'GET',
+          redirect: 'follow',
+        }
       )
       if (!res.ok) {
         throw new ResourceError('Error number is ' + res.status)
@@ -71,18 +75,19 @@ export default class MovieApiService {
       return error
     }
   }
-  async postGuestMovies(id, rating) {
+  async postGuestMovies(id, rating, guestSessionId) {
     try {
-      const res = await fetch(`https://api.themoviedb.org/3/movie/${id}/rating`, {
-        method: 'POST',
-        headers: {
-          accept: 'application/json',
-          'Content-Type': 'application/json;charset=utf-8',
-          Authorization:
-            'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJmZjRhYThjMWY5M2Y2NTUyYzkwZWM1NWQ4ZDkyODI2YSIsInN1YiI6IjY1NGU0OWUzNDFhNTYxMzM2ODg3MDA2NSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.yyIOsm-pcTOBNaCQa1mXH-ZcBGEMCDhn-zbj0YDXqUI',
-        },
-        body: JSON.stringify({ value: rating }),
-      })
+      const res = await fetch(
+        `https://api.themoviedb.org/3/movie/${id}/rating?guest_session_id=${guestSessionId}&api_key=${this._apiKey}`,
+        {
+          method: 'POST',
+          headers: {
+            accept: 'application/json',
+            'Content-Type': 'application/json;charset=utf-8',
+          },
+          body: JSON.stringify({ value: rating }),
+        }
+      )
       const resJson = await res.json()
       return resJson
     } catch (error) {
