@@ -21,7 +21,24 @@ export default class Card extends React.Component {
       }
     })
     const movieRate = this.props.movieRate
-    const movieRateDesktop = movieRate !== 0 ? <p className="card-desktop__text__votes">{movieRate}</p> : null
+    let movieRateDesktop = null
+    if (movieRate > 0 && movieRate < 3) {
+      movieRateDesktop = (
+        <p className="card-desktop__text__votes card-desktop__text__votes--border-color-low">{movieRate}</p>
+      )
+    } else if (movieRate >= 3 && movieRate < 5) {
+      movieRateDesktop = (
+        <p className="card-desktop__text__votes card-desktop__text__votes--border-color-med">{movieRate}</p>
+      )
+    } else if (movieRate >= 5 && movieRate < 7) {
+      movieRateDesktop = (
+        <p className="card-desktop__text__votes card-desktop__text__votes--border-color-high">{movieRate}</p>
+      )
+    } else if (movieRate >= 7) {
+      movieRateDesktop = (
+        <p className="card-desktop__text__votes card-desktop__text__votes--border-color-top">{movieRate}</p>
+      )
+    }
     const movieRateMobile =
       movieRate !== 0 ? <p className="card-desktop__text__votes card-mobile__top__text__votes">{movieRate}</p> : null
 

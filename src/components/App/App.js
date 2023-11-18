@@ -125,6 +125,7 @@ export default class App extends React.Component {
             title: movie.title,
             poster: movie.poster_path,
             overview: this.truncateText(movie.overview),
+            votes: 0,
             releaseDate: movie.release_date,
           }
         })
