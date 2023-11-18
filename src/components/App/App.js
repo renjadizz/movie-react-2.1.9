@@ -43,12 +43,25 @@ export default class App extends React.Component {
     if (prevState.guestSessionId !== this.state.guestSessionId) {
       this.populateRatedMovies(this.state.guestPage, this.state.guestSessionId)
     }
-    if (this.state.needUpdate) {
-      //this.populateAllMovies(this.state.page, this.state.search)
-      this.populateRatedMovies(this.state.guestPage, this.state.guestSessionId)
-      this.setState({
-        needUpdate: false,
-      })
+    if (this.state.needUpdate !== false) {
+      const movieId = this.state.needUpdate[0]
+      let movie = this.state.movies.find((element) => element.id === movieId)
+      movie['votes'] = this.state.needUpdate[1]
+      if (this.state.guestMovies.find((element) => element.id === movieId)) {
+        const updateMovie = this.state.guestMovies.map((movie) => {
+          if (movie.id !== movieId) {
+            return movie
+          } else {
+            return {
+              ...movie,
+              votes: this.state.needUpdate[1],
+            }
+          }
+        })
+        this.setState({ guestMovies: updateMovie, needUpdate: false })
+      } else {
+        this.setState({ guestMovies: [...this.state.guestMovies, movie], needUpdate: false })
+      }
     }
   }
   truncateText(text) {
@@ -63,9 +76,8 @@ export default class App extends React.Component {
         this.setState({ guestSessionId: results.guest_session_id, guestSessionExpires: results.expires_at })
     })
   }
-
-  populateRatedMovies(pageNumber, guestId) {
-    this.data
+  getRatedMovies(pageNumber, guestId) {
+    const ratedMovies = this.data
       .getGuestMovies(pageNumber, guestId)
       .then((results) => {
         if (results instanceof Error) throw new Error(results.message)
@@ -81,12 +93,7 @@ export default class App extends React.Component {
           }
         })
         const totalGuestMovies = results.total_results
-        this.setState({
-          guestMovies: movies,
-          loading: false,
-          error: null,
-          totalGuestMovies,
-        })
+        return { movies, totalGuestMovies }
       })
       .catch((error) => {
         this.setState({
@@ -95,6 +102,16 @@ export default class App extends React.Component {
           totalGuestMovies: 0,
         })
       })
+    return ratedMovies
+  }
+  async populateRatedMovies(pageNumber, guestId) {
+    const data = await this.getRatedMovies(pageNumber, guestId)
+    this.setState({
+      guestMovies: data.movies,
+      loading: false,
+      error: null,
+      totalGuestMovies: data.totalGuestMovies,
+    })
   }
   populateAllMovies(pageNumber, search) {
     this.data
@@ -171,7 +188,7 @@ export default class App extends React.Component {
     this.data.postGuestMovies(id, value, this.state.guestSessionId).then((result) => {
       if (result.success === true) {
         this.setState({
-          needUpdate: true,
+          needUpdate: [id, value],
         })
       }
     })

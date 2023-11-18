@@ -27,9 +27,13 @@
 }
 
 .card-desktop__text__votes {
-    border-radius: 30px;
     border: 0.2rem solid #E9D100;
-    padding: 0.2rem 0.6rem;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .card-desktop__text__title {
